@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package event;
+
+option go_package="github.com/izaakdale/service-event/schema/event";
+
+message EventRequest {
+    int64 event_id = 1;
+}
+
+message EventResponse {
+    int64 event_id = 1;
+	string event_name = 2;
+    int32 tickets_remaining = 3;
+    string timestamp = 4;
+}
+
+message ListEventRequest {
+    repeated int64 event_ids = 1;
+}
+
+message ListEventResponse {
+    repeated EventResponse events = 1;
+}
+
+service EventService {
+    rpc GetEvent(EventRequest) returns (EventResponse);
+}
