@@ -25,4 +25,5 @@ message ListEventResponse {
 
 service EventService {
     rpc GetEvent(EventRequest) returns (EventResponse);
+    rpc GetEvents(ListEventRequest) returns (ListEventResponse);
 }
