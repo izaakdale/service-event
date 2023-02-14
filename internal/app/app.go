@@ -7,7 +7,7 @@ import (
 	"net"
 
 	db "github.com/izaakdale/service-event/internal/datastore/sqlc"
-	"github.com/izaakdale/service-event/schema/event"
+	"github.com/izaakdale/service-event/pkg/schema/event"
 	"github.com/kelseyhightower/envconfig"
 	"google.golang.org/grpc"
 )

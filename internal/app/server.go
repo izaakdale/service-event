@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/izaakdale/service-event/schema/event"
+	"github.com/izaakdale/service-event/pkg/schema/event"
 )
 
 func (g *GServer) GetEvent(ctx context.Context, ev *event.EventRequest) (*event.EventResponse, error) {
