@@ -9,6 +9,7 @@ import (
 	db "github.com/izaakdale/service-event/internal/datastore/sqlc"
 	"github.com/izaakdale/service-event/pkg/schema/event"
 	"github.com/kelseyhightower/envconfig"
+	_ "github.com/lib/pq"
 	"google.golang.org/grpc"
 )
 
@@ -27,10 +28,10 @@ type (
 		event.EventServiceServer
 	}
 	specification struct {
-		GRPCHost         string
-		GRPCPort         string
-		DBDriver         string
-		DBDataSourceName string
+		GRPCHost         string `envconfig:"GRPC_HOST"`
+		GRPCPort         string `envconfig:"GRPC_PORT"`
+		DBDriver         string `envconfig:"DB_DRIVER"`
+		DBDataSourceName string `envconfig:"DB_DATA_SOURCE_NAME"`
 	}
 )
 
