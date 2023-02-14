@@ -16,8 +16,9 @@ WHERE event_id = $1 LIMIT 1;
 SELECT * FROM events
 WHERE event_id = ANY(@ids::bigint[]);
 
+-- name: UpdateEvent :one
 UPDATE events
-SET tickets_remaining = tickets_remaining - $2
+SET tickets_remaining = tickets_remaining - sqlc.arg(n_tickets)::int
 WHERE event_id = $1
 RETURNING *;
 

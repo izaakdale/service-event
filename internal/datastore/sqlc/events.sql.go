@@ -100,3 +100,27 @@ func (q *Queries) GetEvents(ctx context.Context, ids []int64) ([]Event, error) {
 	}
 	return items, nil
 }
+
+const updateEvent = `-- name: UpdateEvent :one
+UPDATE events
+SET tickets_remaining = tickets_remaining - $2::int
+WHERE event_id = $1
+RETURNING event_id, event_name, tickets_remaining, event_timestamp
+`
+
+type UpdateEventParams struct {
+	EventID  int64 `json:"event_id"`
+	NTickets int32 `json:"n_tickets"`
+}
+
+func (q *Queries) UpdateEvent(ctx context.Context, arg UpdateEventParams) (Event, error) {
+	row := q.db.QueryRowContext(ctx, updateEvent, arg.EventID, arg.NTickets)
+	var i Event
+	err := row.Scan(
+		&i.EventID,
+		&i.EventName,
+		&i.TicketsRemaining,
+		&i.EventTimestamp,
+	)
+	return i, err
+}

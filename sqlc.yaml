@@ -1,7 +1,7 @@
 version: 1
 packages:
   - name: "db"
-    path: "./datastore/sqlc"
+    path: "./internal/datastore/sqlc"
     engine: "postgresql"
     schema: "./internal/datastore/migrations"
     queries: "./internal/datastore/query"

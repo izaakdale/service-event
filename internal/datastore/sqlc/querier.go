@@ -13,6 +13,7 @@ type Querier interface {
 	DeleteEvent(ctx context.Context, eventID int64) error
 	GetEvent(ctx context.Context, eventID int64) (Event, error)
 	GetEvents(ctx context.Context, ids []int64) ([]Event, error)
+	UpdateEvent(ctx context.Context, arg UpdateEventParams) (Event, error)
 }
 
 var _ Querier = (*Queries)(nil)
