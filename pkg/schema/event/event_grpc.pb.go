@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.21.12
-// source: schema/event/event.proto
+// source: pkg/schema/event/event.proto
 
 package event
 
@@ -24,6 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 type EventServiceClient interface {
 	GetEvent(ctx context.Context, in *EventRequest, opts ...grpc.CallOption) (*EventResponse, error)
 	GetEvents(ctx context.Context, in *ListEventRequest, opts ...grpc.CallOption) (*ListEventResponse, error)
+	MakeOrder(ctx context.Context, in *OrderRequest, opts ...grpc.CallOption) (*OrderResponse, error)
 }
 
 type eventServiceClient struct {
@@ -52,12 +53,22 @@ func (c *eventServiceClient) GetEvents(ctx context.Context, in *ListEventRequest
 	return out, nil
 }
 
+func (c *eventServiceClient) MakeOrder(ctx context.Context, in *OrderRequest, opts ...grpc.CallOption) (*OrderResponse, error) {
+	out := new(OrderResponse)
+	err := c.cc.Invoke(ctx, "/event.EventService/MakeOrder", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // EventServiceServer is the server API for EventService service.
 // All implementations must embed UnimplementedEventServiceServer
 // for forward compatibility
 type EventServiceServer interface {
 	GetEvent(context.Context, *EventRequest) (*EventResponse, error)
 	GetEvents(context.Context, *ListEventRequest) (*ListEventResponse, error)
+	MakeOrder(context.Context, *OrderRequest) (*OrderResponse, error)
 	mustEmbedUnimplementedEventServiceServer()
 }
 
@@ -70,6 +81,9 @@ func (UnimplementedEventServiceServer) GetEvent(context.Context, *EventRequest) 
 }
 func (UnimplementedEventServiceServer) GetEvents(context.Context, *ListEventRequest) (*ListEventResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetEvents not implemented")
+}
+func (UnimplementedEventServiceServer) MakeOrder(context.Context, *OrderRequest) (*OrderResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MakeOrder not implemented")
 }
 func (UnimplementedEventServiceServer) mustEmbedUnimplementedEventServiceServer() {}
 
@@ -120,6 +134,24 @@ func _EventService_GetEvents_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _EventService_MakeOrder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(OrderRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EventServiceServer).MakeOrder(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/event.EventService/MakeOrder",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EventServiceServer).MakeOrder(ctx, req.(*OrderRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // EventService_ServiceDesc is the grpc.ServiceDesc for EventService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -135,7 +167,11 @@ var EventService_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "GetEvents",
 			Handler:    _EventService_GetEvents_Handler,
 		},
+		{
+			MethodName: "MakeOrder",
+			Handler:    _EventService_MakeOrder_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "schema/event/event.proto",
+	Metadata: "pkg/schema/event/event.proto",
 }

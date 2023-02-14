@@ -3,8 +3,8 @@ packages:
   - name: "db"
     path: "./datastore/sqlc"
     engine: "postgresql"
-    schema: "./datastore/migrations"
-    queries: "./datastore/query"
+    schema: "./internal/datastore/migrations"
+    queries: "./internal/datastore/query"
     emit_json_tags: true
     emit_prepared_queries: false
     emit_interface: true

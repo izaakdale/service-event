@@ -16,6 +16,11 @@ WHERE event_id = $1 LIMIT 1;
 SELECT * FROM events
 WHERE event_id = ANY(@ids::bigint[]);
 
+UPDATE events
+SET tickets_remaining = tickets_remaining - $2
+WHERE event_id = $1
+RETURNING *;
+
 -- name: DeleteEvent :exec
 DELETE FROM events
 WHERE event_id = $1;

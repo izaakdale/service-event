@@ -5,13 +5,13 @@ createdb:
 dropdb:
 	docker exec -it eventDB dropdb events
 migrateup:
-	migrate -path datastore/migrations -database "postgresql://root:secret@localhost:5432/events?sslmode=disable" -verbose up
+	migrate -path internal/datastore/migrations -database "postgresql://root:secret@localhost:5432/events?sslmode=disable" -verbose up
 migratedown:
-	migrate -path datastore/migrations -database "postgresql://root:secret@localhost:5432/events?sslmode=disable" -verbose down
+	migrate -path internal/datastore/migrations -database "postgresql://root:secret@localhost:5432/events?sslmode=disable" -verbose down
 sqlc:
 	sqlc generate
 
-PROTO_DIR=schema/event
+PROTO_DIR=pkg/schema/event
 gproto:
 	protoc --proto_path=. --go_out=. --go_opt=paths=source_relative ${PROTO_DIR}/*.proto \
 	 --go-grpc_out=. --go-grpc_opt=paths=source_relative ${PROTO_DIR}/*.proto
