@@ -15,3 +15,10 @@ PROTO_DIR=schema/event
 gproto:
 	protoc --proto_path=. --go_out=. --go_opt=paths=source_relative ${PROTO_DIR}/*.proto \
 	 --go-grpc_out=. --go-grpc_opt=paths=source_relative ${PROTO_DIR}/*.proto
+
+run:
+	DB_DRIVER=postgres \
+	DB_DATA_SOURCE_NAME=postgresql://root:secret@localhost:5432/events?sslmode=disable \
+	GRPC_PORT=50001 \
+	GRPC_HOST=localhost \
+	go run .
