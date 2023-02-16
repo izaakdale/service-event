@@ -11,12 +11,29 @@ migratedown:
 sqlc:
 	sqlc generate
 
-PROTO_DIR=pkg/schema/event
+PROTO_DIR=pkg/proto/event
 gproto:
-	protoc --proto_path=. --go_out=. --go_opt=paths=source_relative ${PROTO_DIR}/*.proto \
-	 --go-grpc_out=. --go-grpc_opt=paths=source_relative ${PROTO_DIR}/*.proto
+	protoc \
+	--proto_path=. \
+	--go_out=. \
+	--go_opt=paths=source_relative \
+	${PROTO_DIR}/*.proto \
+	 --go-grpc_out=. \
+	 --go-grpc_opt=paths=source_relative \
+	 ${PROTO_DIR}/*.proto
+ghttp:
+	protoc -I . \
+	--grpc-gateway_out \
+	. \
+	--grpc-gateway_opt \
+	logtostderr=true \
+	--grpc-gateway_opt \
+	paths=source_relative \
+	 ${PROTO_DIR}/*.proto
 
 run:
+	HOST=localhost \
+	PORT=9090 \
 	DB_DRIVER=postgres \
 	DB_DATA_SOURCE_NAME=postgresql://root:secret@localhost:5432/events?sslmode=disable \
 	GRPC_PORT=50001 \

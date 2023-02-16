@@ -4,8 +4,9 @@ import (
 	"context"
 	"time"
 
+	"github.com/google/uuid"
 	db "github.com/izaakdale/service-event/internal/datastore/sqlc"
-	"github.com/izaakdale/service-event/pkg/schema/event"
+	"github.com/izaakdale/service-event/pkg/proto/event"
 	_ "github.com/lib/pq"
 )
 
@@ -47,7 +48,12 @@ func (g *GServer) MakeOrder(ctx context.Context, e *event.OrderRequest) (*event.
 	if err != nil {
 		return nil, err
 	}
+
+	// create an order UUID
+	// publish to SNS
+
 	return &event.OrderResponse{
 		EventId: dbe.EventID,
+		OrderId: uuid.New().String(),
 	}, nil
 }
