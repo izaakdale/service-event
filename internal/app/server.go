@@ -42,13 +42,12 @@ func (g *GServer) GetEvents(ctx context.Context, le *event.ListEventRequest) (*e
 func (g *GServer) MakeOrder(ctx context.Context, e *event.OrderRequest) (*event.OrderResponse, error) {
 	dbe, err := querier.UpdateEvent(ctx, db.UpdateEventParams{
 		EventID:  e.EventId,
-		NTickets: e.NOfTickets,
+		NTickets: int32(len(e.Attendees)),
 	})
 	if err != nil {
 		return nil, err
 	}
 	return &event.OrderResponse{
-		EventId:          dbe.EventID,
-		TicketsRemaining: dbe.TicketsRemaining,
+		EventId: dbe.EventID,
 	}, nil
 }

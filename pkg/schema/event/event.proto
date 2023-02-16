@@ -4,6 +4,12 @@ package event;
 
 option go_package="github.com/izaakdale/service-event/pkg/schema/event";
 
+service EventService {
+    rpc GetEvent(EventRequest) returns (EventResponse);
+    rpc GetEvents(ListEventRequest) returns (ListEventResponse);
+    rpc MakeOrder(OrderRequest) returns (OrderResponse);
+}
+
 message EventRequest {
     int64 event_id = 1;
 }
@@ -23,15 +29,35 @@ message ListEventResponse {
 
 message OrderRequest {
     int64 event_id = 1;
-    int32 n_of_tickets = 2;
+    ContactDetails contact_details = 2;
+    PaymentDetails payment_details = 3;
+    repeated Attendee attendees = 4;
 }
-message OrderResponse {
-    int64 event_id = 1;
-    int32 tickets_remaining = 2;
+message ContactDetails {
+    string  name = 1;
+    string  surname = 2;
+    string  email = 3;
+    string  phone_number = 4;
+    Address address = 5;
+}
+message Address {
+    string name_or_number =1;
+    string street =2;
+    string city = 3;
+    string postcode = 4;
+}
+message PaymentDetails {
+    string method = 1;
+}
+message Attendee {
+    string name = 1;
+    string surname = 2;
+    int32    birth_day = 3;
+    int32    birth_month = 4;
+    int32    birth_year = 5;
+    string ticket_type = 6;
 }
 
-service EventService {
-    rpc GetEvent(EventRequest) returns (EventResponse);
-    rpc GetEvents(ListEventRequest) returns (ListEventResponse);
-    rpc MakeOrder(OrderRequest) returns (OrderResponse);
+message OrderResponse {
+    int64 event_id = 1;
 }
