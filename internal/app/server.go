@@ -2,9 +2,11 @@ package app
 
 import (
 	"context"
+	"encoding/json"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/izaakdale/lib/publisher"
 	db "github.com/izaakdale/service-event/internal/datastore/sqlc"
 	"github.com/izaakdale/service-event/pkg/proto/event"
 	_ "github.com/lib/pq"
@@ -50,10 +52,20 @@ func (g *GServer) MakeOrder(ctx context.Context, e *event.OrderRequest) (*event.
 	}
 
 	// create an order UUID
+	id := uuid.New().String()
 	// publish to SNS
+	eBytes, err := json.Marshal(dbe)
+	if err != nil {
+		return nil, err
+	}
+	// not using message id for now.
+	_, err = publisher.Publish(string(eBytes))
+	if err != nil {
+		return nil, err
+	}
 
 	return &event.OrderResponse{
 		EventId: dbe.EventID,
-		OrderId: uuid.New().String(),
+		OrderId: id,
 	}, nil
 }

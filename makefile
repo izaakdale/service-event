@@ -38,4 +38,6 @@ run:
 	DB_DATA_SOURCE_NAME=postgresql://root:secret@localhost:5432/events?sslmode=disable \
 	GRPC_PORT=50001 \
 	GRPC_HOST=localhost \
+	TOPIC_ARN=arn:aws:sns:eu-west-2:000000000000:order-placed-events \
+	AWS_ENDPOINT=http://localhost:4566 \
 	go run .

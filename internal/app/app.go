@@ -11,7 +11,9 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/izaakdale/lib/publisher"
 	db "github.com/izaakdale/service-event/internal/datastore/sqlc"
 	"github.com/izaakdale/service-event/pkg/proto/event"
 	"github.com/kelseyhightower/envconfig"
@@ -39,6 +41,9 @@ type (
 		GRPCPort         string `envconfig:"GRPC_PORT"`
 		DBDriver         string `envconfig:"DB_DRIVER"`
 		DBDataSourceName string `envconfig:"DB_DATA_SOURCE_NAME"`
+		AWSRegion        string `envconfig:"AWS_REGION" default:"eu-west-2"`
+		TopicArn         string `envconfig:"TOPIC_ARN"`
+		AWSEndpoint      string `envconfig:"AWS_ENDPOINT"`
 	}
 )
 
@@ -54,6 +59,18 @@ func Run() {
 
 	grpcServerSocket = fmt.Sprintf("%s:%s", spec.GRPCHost, spec.GRPCPort)
 	grpcMuxSocket = fmt.Sprintf("%s:%s", spec.Host, spec.Port)
+
+	cfg, err := config.LoadDefaultConfig(context.Background(), func(o *config.LoadOptions) error {
+		o.Region = spec.AWSRegion
+		return nil
+	})
+	if err != nil {
+		panic(err)
+	}
+	err = publisher.Initialise(cfg, spec.TopicArn, publisher.WithEndpoint(spec.AWSEndpoint))
+	if err != nil {
+		panic(err)
+	}
 
 	// datastore setup
 	dbConn, err := sql.Open(spec.DBDriver, spec.DBDataSourceName)
@@ -94,7 +111,7 @@ func Run() {
 	shutCh := make(chan os.Signal, 1)
 	signal.Notify(shutCh, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
 
-	// wait on error from server or mux
+	// wait on error from server, mux or shutdown sig.
 	select {
 	case err = <-errChan:
 		if err != nil {
