@@ -119,5 +119,6 @@ func Run() {
 		}
 	case signal := <-shutCh:
 		log.Printf("got shutdown signal: %s, exiting\n", signal)
+		os.Exit(1)
 	}
 }
