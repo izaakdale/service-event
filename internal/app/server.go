@@ -3,11 +3,13 @@ package app
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/izaakdale/lib/publisher"
 	db "github.com/izaakdale/service-event/internal/datastore/sqlc"
+	"github.com/izaakdale/service-event/pkg/notifications"
 	"github.com/izaakdale/service-event/pkg/proto/event"
 	_ "github.com/lib/pq"
 )
@@ -43,6 +45,10 @@ func (g *GServer) GetEvents(ctx context.Context, le *event.ListEventRequest) (*e
 }
 
 func (g *GServer) MakeOrder(ctx context.Context, e *event.OrderRequest) (*event.OrderResponse, error) {
+	// create an order UUID
+	id := uuid.New().String()
+	log.Printf("placing order %s\n", id)
+
 	dbe, err := querier.UpdateEvent(ctx, db.UpdateEventParams{
 		EventID:  e.EventId,
 		NTickets: int32(len(e.Attendees)),
@@ -51,15 +57,19 @@ func (g *GServer) MakeOrder(ctx context.Context, e *event.OrderRequest) (*event.
 		return nil, err
 	}
 
-	// create an order UUID
-	id := uuid.New().String()
 	// publish to SNS
-	eBytes, err := json.Marshal(dbe)
+	payload := notifications.OrderCreatedPayload{
+		OrderID:      id,
+		OrderRequest: e,
+	}
+
+	// not using message id for now.
+	oBytes, err := json.Marshal(payload)
 	if err != nil {
 		return nil, err
 	}
-	// not using message id for now.
-	_, err = publisher.Publish(string(eBytes))
+
+	_, err = publisher.Publish(string(oBytes))
 	if err != nil {
 		return nil, err
 	}
