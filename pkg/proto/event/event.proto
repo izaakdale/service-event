@@ -7,7 +7,11 @@ option go_package="github.com/izaakdale/service-event/pkg/schema/event";
 
 
 service EventService {
-    rpc GetEvent(EventRequest) returns (EventResponse);
+    rpc GetEvent(EventRequest) returns (EventResponse) {
+        option (google.api.http) = {
+            get: "/{event_id}"
+        };
+    };
     rpc GetEvents(ListEventRequest) returns (ListEventResponse);
     rpc MakeOrder(OrderRequest) returns (OrderResponse) {
         option (google.api.http) = {

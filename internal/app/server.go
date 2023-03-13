@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"log"
 	"time"
 
@@ -15,6 +16,8 @@ import (
 )
 
 func (g *GServer) GetEvent(ctx context.Context, ev *event.EventRequest) (*event.EventResponse, error) {
+	log.Printf("fetching event %d\n", ev.EventId)
+
 	dbe, err := querier.GetEvent(ctx, ev.EventId)
 	if err != nil {
 		return nil, err
@@ -45,6 +48,11 @@ func (g *GServer) GetEvents(ctx context.Context, le *event.ListEventRequest) (*e
 }
 
 func (g *GServer) MakeOrder(ctx context.Context, e *event.OrderRequest) (*event.OrderResponse, error) {
+	err := validateOrderRequest(e)
+	if err != nil {
+		return nil, err
+	}
+
 	// create an order UUID
 	id := uuid.New().String()
 	log.Printf("placing order %s\n", id)
@@ -69,7 +77,7 @@ func (g *GServer) MakeOrder(ctx context.Context, e *event.OrderRequest) (*event.
 		return nil, err
 	}
 
-	_, err = publisher.Publish(string(oBytes))
+	_, err = publisher.Publish(ctx, string(oBytes))
 	if err != nil {
 		return nil, err
 	}
@@ -78,4 +86,23 @@ func (g *GServer) MakeOrder(ctx context.Context, e *event.OrderRequest) (*event.
 		EventId: dbe.EventID,
 		OrderId: id,
 	}, nil
+}
+
+func validateOrderRequest(e *event.OrderRequest) error {
+	// TODO this only protects against incorrect event id and empty data.
+	// Does not validate any nested data
+
+	if e.EventId < 0 {
+		return errors.New("invalid event id")
+	}
+	if e.Attendees == nil {
+		return errors.New("attendees not set")
+	}
+	if e.ContactDetails == nil {
+		return errors.New("contact details not set")
+	}
+	if e.PaymentDetails == nil {
+		return errors.New("payment details not set")
+	}
+	return nil
 }
