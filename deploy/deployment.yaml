@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service-event-deployment
+  labels:
+    app: service-event
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: service-event
+  template:
+    metadata:
+      labels:
+        app: service-event
+    spec:
+      containers:
+      - name: service-event
+        image: 735542962543.dkr.ecr.eu-west-2.amazonaws.com/service-event:latest
+        env:
+          - name: DB_DRIVER
+            value: postgres
+          - name: DB_DATA_SOURCE_NAME
+            value: postgresql://edu:secretsecret@events.ch7ovnhw6ksr.eu-west-2.rds.amazonaws.com:5432/events?sslmode=disable
+          - name: GRPC_PORT
+            value: "50001"
+          - name: TOPIC_ARN
+            value: arn:aws:sns:eu-west-2:735542962543:order-placed-events
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+      

@@ -55,7 +55,6 @@ func (g *GServer) MakeOrder(ctx context.Context, e *event.OrderRequest) (*event.
 
 	// create an order UUID
 	id := uuid.New().String()
-	log.Printf("placing order %s\n", id)
 
 	dbe, err := querier.UpdateEvent(ctx, db.UpdateEventParams{
 		EventID:  e.EventId,
@@ -82,6 +81,7 @@ func (g *GServer) MakeOrder(ctx context.Context, e *event.OrderRequest) (*event.
 		return nil, err
 	}
 
+	log.Printf("placing order %s\n", id)
 	return &event.OrderResponse{
 		EventId: dbe.EventID,
 		OrderId: id,
